@@ -1,0 +1,123 @@
+- name: Check /tmp writable to store checker.
+  stat:
+    path: /tmp/spectre-meltdown-checker/spectre-meltdown-checker.sh
+  register: tmp_stat
+
+- name: Create /tmp/spectre-meltdown-checker/
+  file:
+    path: /tmp/spectre-meltdown-checker/
+    state: directory
+  when: tmp_stat.stat.exists == False
+
+- name: Download spectre-meltdown-checker
+  get_url:
+    url: "https://meltdown.ovh"
+    dest: /tmp/spectre-meltdown-checker/spectre-meltdown-checker.sh
+    mode: 700
+    force: yes
+
+- block:
+  - name: Run check variant 1
+    command: /tmp/spectre-meltdown-checker/spectre-meltdown-checker.sh --batch json --variant 1
+    register: check
+    failed_when: false
+    changed_when: false
+  - name: VULNERABLE to variant 1?
+    assert:
+      that:
+        - "not (check.stdout | from_json | first).VULNERABLE == true"
+      fail_msg: "This host is vulnerable to variant 1 (Spectre)."
+      success_msg: "This host is NOT vulnerable to variant 1 (Spectre)."
+    ignore_errors: yes
+  - name: Check output variant 1
+    debug:
+      var: check.stdout_lines
+    when: "(check.stdout | from_json | first).VULNERABLE == true"
+
+  tags:
+    - variant-1
+    - spectre
+
+- block:
+  - name: Run check variant 2
+    command: /tmp/spectre-meltdown-checker/spectre-meltdown-checker.sh --batch json --variant 2
+    register: check
+    failed_when: false
+    changed_when: false
+  - name: VULNERABLE to variant 2?
+    assert:
+      that:
+        - "not (check.stdout | from_json | first).VULNERABLE == true"
+      fail_msg: "This host is vulnerable to variant 2 (Spectre)."
+      success_msg: "This host is NOT vulnerable to variant 2 (Spectre)."
+    ignore_errors: yes
+  - name: Check output variant 2
+    debug:
+      var: check.stdout_lines
+    when: "(check.stdout | from_json | first).VULNERABLE == true"
+  tags:
+    - variant-2
+    - spectre
+
+- block:
+  - name: Run check variant 3
+    command: /tmp/spectre-meltdown-checker/spectre-meltdown-checker.sh --batch json --variant 3
+    register: check
+    failed_when: false
+    changed_when: false
+  - name: AVULNERABLE to variant 3?
+    assert:
+      that:
+        - "not (check.stdout | from_json | first).VULNERABLE == true"
+      fail_msg: "This host is vulnerable to variant 3 (Meltdown)."
+      success_msg: "This host is NOT vulnerable to variant 3 (Meltdown)."
+    ignore_errors: yes
+  - name: Check output variant 3
+    debug:
+      var: check.stdout_lines
+    when: "(check.stdout | from_json | first).VULNERABLE == true"
+  tags:
+    - variant-3
+    - meltdown
+
+- block:
+  - name: Run check variant 3a
+    command: /tmp/spectre-meltdown-checker/spectre-meltdown-checker.sh --batch json --variant 3a
+    register: check
+    failed_when: false
+    changed_when: false
+  - name: AVULNERABLE to variant 3a?
+    assert:
+      that:
+        - "not (check.stdout | from_json | first).VULNERABLE == true"
+      fail_msg: "This host is vulnerable to variant 3a (Meltdown)."
+      success_msg: "This host is NOT vulnerable to variant 3a (Meltdown)."
+    ignore_errors: yes
+  - name: Check output variant 3a
+    debug:
+      var: check.stdout_lines
+    when: "(check.stdout | from_json | first).VULNERABLE == true"
+  tags:
+    - variant-3a
+    - meltdown
+
+- block:
+  - name: Run check variant 4
+    command: /tmp/spectre-meltdown-checker/spectre-meltdown-checker.sh --batch json --variant 4
+    register: check
+    failed_when: false
+    changed_when: false
+  - name: AVULNERABLE to variant 4?
+    assert:
+      that:
+        - "not (check.stdout | from_json | first).VULNERABLE == true"
+      fail_msg: "This host is vulnerable to variant 4 (Meltdown)."
+      success_msg: "This host is NOT vulnerable to variant 4 (Meltdown)."
+    ignore_errors: yes
+  - name: Check output variant 4
+    debug:
+      var: check.stdout_lines
+    when: "(check.stdout | from_json | first).VULNERABLE == true"
+  tags:
+    - variant-4
+    - meltdown

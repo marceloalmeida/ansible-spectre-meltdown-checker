@@ -1,0 +1,21 @@
+galaxy_info:
+  author: Marcelo Almeida
+  description: Spectre & Meldown check
+
+  license: MIT
+
+  min_ansible_version: 2.5
+
+  github_branch: master
+
+  platforms:
+  - name: GenericLinux
+    versions:
+    - all
+
+  galaxy_tags:
+    - spectre
+    - meltdown
+    - check
+
+dependencies: []
